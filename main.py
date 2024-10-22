@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 import re
 import random
 import time
+from genetic_algorithm import geneticAlgorithm
 
 def parse_args():
     parser = ArgumentParser(description = 'Knapsack Problem')
@@ -43,7 +44,7 @@ def main():
     else:
         if args.seed is not None:
             random.seed(args.seed)
-        valueList = random.sample(range(1, 9999), int(args.totalItems))
+        valuesList = random.sample(range(1, 9999), int(args.totalItems))
         weightList = random.sample(range(1, 9999), int(args.totalItems))
 
         if args.W is not None:
@@ -51,15 +52,18 @@ def main():
         else:
             capacity = random.randint(1, 99999)
 
-    print(valueList)
-    print(weightList)
-    print(capacity)
+    print('Values list: ',valuesList)
+    print('Weights list: ', weightList)
+    print('Capacity: ', capacity)
 
     if args.algorithm == 'random':
         start = time.time()
-        #randomAlgorithm()
+        value, weight, items = randomAlgorithm(valuesList, weightList, capacity)
         end = time.time()
-        print('Elapsed time random: ')
+        print('Elapsed time random: ', end - start)
+        print('Value: ', value)
+        print('Weight: ', weight)
+        print('Items: ', items)
 
     elif args.algorithm == 'annealing':
         start = time.time()
@@ -68,10 +72,32 @@ def main():
         print('Elapsed time annealing: ')
 
     elif args.algorithm == 'genetic':
+        if not args.populationSize or not args.numGenerations or not args.mutationRate:
+            print('ERROR: Missing parameters for genetic algorithm')
+            return
         start = time.time()
-        #geneticAlgorithm()
+        geneticAlgorithm(valuesList, weightList, capacity, args.populationSize, args.numGenerations, args.mutationRate)
         end = time.time()
         print('Elapsed time genetic: ')
 
+def randomAlgorithm(values, weights, capacity):
+    """Inserts random items in the knapsack until it tries 
+    to insert an item that would exceed the capacity. """
+    currentWeight = 0
+    currentValue = 0
+    knapsackValues = []
+    while currentWeight < capacity and len(values):
+        item = random.randint(0, len(values) - 1)
+        if currentWeight + weights[item] <= capacity:
+            currentWeight += weights[item]
+            currentValue += values[item]
+            knapsackValues.append(values[item])
+            weights.pop(item)
+            values.pop(item)
+        else:
+            break
+    return currentValue, currentWeight, knapsackValues
+            
+
 if __name__ == '__main__':
-    main() 
+    main()             
