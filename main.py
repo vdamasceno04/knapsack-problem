@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 import re
 import random
 import time
+import matplotlib.pyplot as plt
+import numpy as np
 from genetic_algorithm import geneticAlgorithm
 
 def parse_args():
@@ -15,6 +17,8 @@ def parse_args():
                         help = 'Items weights list (ex: [1,2,3])')
     parser.add_argument('-W', action = 'store', dest = 'W', type = int, required = False,
                         help = 'Knapsack capacity')
+    parser.add_argument('-ex', action = 'store', dest = 'exec', type = int, required = False,
+                        help = 'Times to execute the algorithm')
     parser.add_argument('-ps', action = 'store', dest = 'populationSize', type = int, required = False,
                         help = 'only for genetic algorithm')
     parser.add_argument('-ng', action = 'store', dest = 'numGenerations', type = int, required = False,
@@ -56,29 +60,67 @@ def main():
     print('Weights list: ', weightList)
     print('Capacity: ', capacity)
 
-    if args.algorithm == 'random':
-        start = time.time()
-        value, weight, items = randomAlgorithm(valuesList, weightList, capacity)
-        end = time.time()
-        print('Elapsed time random: ', end - start)
-        print('Value: ', value)
-        print('Weight: ', weight)
-        print('Items: ', items)
+    if args.exec is None:
+        args.exec = 1
+    contExec = 0
+    bestValues = [523, 24, 734, 56, 725, 688, 888, 995, 888, 888]
+    lastValues = []
+    bestCycles = []
+    while(contExec < args.exec):
+        if args.algorithm == 'random':
+            start = time.time()
+            value, weight, items = randomAlgorithm(valuesList, weightList, capacity)
+            end = time.time()
+            print('Elapsed time random: ', end - start)
+            print('Value: ', value)
+            print('Weight: ', weight)
+            print('Items: ', items)
 
-    elif args.algorithm == 'annealing':
-        start = time.time()
-        #annealingAlgorithm()
-        end = time.time()
-        print('Elapsed time annealing: ')
+        elif args.algorithm == 'annealing':
+            #start = time.time()
+            bestValue, bestCycle, lastValue = 1,1,1#annealingAlgorithm(valuesList, weightList, capacity, blablabla)
+            bestValues.append(bestValue)
+            lastValues.append(lastValue)
+            bestCycles.append(bestCycle)
+            #end = time.time()
+            #print('Elapsed time annealing: ')
 
-    elif args.algorithm == 'genetic':
-        if not args.populationSize or not args.numGenerations or not args.mutationRate:
-            print('ERROR: Missing parameters for genetic algorithm')
-            return
-        start = time.time()
-        geneticAlgorithm(valuesList, weightList, capacity, args.populationSize, args.numGenerations, args.mutationRate)
-        end = time.time()
-        print('Elapsed time genetic: ')
+        elif args.algorithm == 'genetic':
+            if not args.populationSize or not args.numGenerations or not args.mutationRate:
+                print('ERROR: Missing parameters for genetic algorithm')
+                return
+            #start = time.time()
+            bestValue, bestCycle, lastValue = geneticAlgorithm(valuesList, weightList, capacity, args.populationSize, args.numGenerations, args.mutationRate)
+            bestValues.append(bestValue)
+            lastValues.append(lastValue)
+            bestCycles.append(bestCycle)
+            #end = time.time()
+            #print('Elapsed time genetic: ') #resultado de tempo é relevante??
+        
+        contExec += 1
+    #plot(bestValues, 'bestValues')
+
+
+def plot(values, info):
+    if info == 'bestValues':
+        maxBest = max(values)
+        print('max = ', maxBest)
+        ranges = np.linspace(0, maxBest, 21)
+        percent_ticks = np.linspace(0, 100, 21)  # De 0 a 100%, 21 ticks para 5% a cada ponto
+        plt.xticks(ranges, [f'{int(p)}%' for p in percent_ticks])
+        plt.yticks(np.linspace(0, 100, 21))
+        weights = np.ones_like(values) / len(values) * 100
+        plt.hist(values, bins=ranges, edgecolor='black', weights=weights)
+        plt.title('Histograma com Faixas de Valores em Porcentagem')
+        plt.xlabel('Porcentagem do Valor Máximo')
+        plt.ylabel('Frequência')
+        plt.grid(True)
+        plt.savefig('histograma_faixas_percentual.png')
+        plt.show()
+
+#################################################################
+
+
 
 def randomAlgorithm(values, weights, capacity):
     """Inserts random items in the knapsack until it tries 
