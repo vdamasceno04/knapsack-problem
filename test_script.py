@@ -43,19 +43,23 @@ def read_and_plot(file_path, algorithm):
         #gp.plot(higher_profit, 'bestValues','histograma_faixas_percentual_' + file_name + '_maior.png')
     
 ##########################################################################################
-execution_number = 10
+execution_number = 1000
 #simulated_annealing
 execute_and_save('txts/sa_afim_no',  execution_number, 0, 0, False)
 read_and_plot('txts/sa_afim_no', 0)
+print("TERMINOU 1")
 
 execute_and_save('txts/sa_afim_yes', execution_number, 0, 0, True)
 read_and_plot('txts/sa_afim_yes', 0)
+print("TERMINOU 2")
 
 execute_and_save('txts/sa_cos_no',   execution_number, 0, 1, False)
 read_and_plot('txts/sa_cos_no', 0)
+print("TERMINOU 3")
 
 execute_and_save('txts/sa_cos_yes',  execution_number, 0, 1, True)
 read_and_plot('txts/sa_cos_yes', 0)
+print("TERMINOU 4")
 #genetic_algorithm
 #execute_and_save('txts/NOME_DO ARQUIVO_AQUI',  execution_number, 1, PARAM1, PARAM2, PARAM3)
 #(TODO)PRENCHER AQUI COM AS TROCAS DE PARAMETRO DE INTERESE COMO O EXEMPLO A CIMA
