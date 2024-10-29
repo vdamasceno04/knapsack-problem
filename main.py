@@ -62,42 +62,37 @@ def main():
     if args.exec is None:
         args.exec = 1
     contExec = 0
-    bestValues = [523, 24, 734, 56, 725, 688, 888, 995, 888, 888]
+    bestValues = []
     lastValues = []
     bestCycles = []
     while(contExec < args.exec):
+        print('exec ', contExec)
         if args.algorithm == 'random':
-            start = time.time()
             value, weight, items = randomAlgorithm(valuesList, weightList, capacity)
-            end = time.time()
-            print('Elapsed time random: ', end - start)
             print('Value: ', value)
             print('Weight: ', weight)
             print('Items: ', items)
 
         elif args.algorithm == 'annealing':
-            #start = time.time()
             bestValue, bestCycle, lastValue = 1,1,1#annealingAlgorithm(valuesList, weightList, capacity, blablabla)
             bestValues.append(bestValue)
             lastValues.append(lastValue)
             bestCycles.append(bestCycle)
-            #end = time.time()
-            #print('Elapsed time annealing: ')
 
         elif args.algorithm == 'genetic':
+            print('caiu')
             if not args.populationSize or not args.numGenerations or not args.mutationRate:
                 print('ERROR: Missing parameters for genetic algorithm')
                 return
-            #start = time.time()
             bestValue, bestCycle, lastValue = geneticAlgorithm(valuesList, weightList, capacity, args.populationSize, args.numGenerations, args.mutationRate)
             bestValues.append(bestValue)
             lastValues.append(lastValue)
             bestCycles.append(bestCycle)
-            #end = time.time()
-            #print('Elapsed time genetic: ') #resultado de tempo é relevante??
-        
+            
         contExec += 1
-    #plot(bestValues, 'bestValues')
+    print('\nBest value: ', bestValues)
+    print('Best cycle: ', bestCycles)
+    print('Last value: ', lastValues)
 
 #################################################################
 

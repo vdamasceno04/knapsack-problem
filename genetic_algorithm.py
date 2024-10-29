@@ -3,11 +3,13 @@ import math
 
 def geneticAlgorithm(valuesList, weightList, capacity, populationSize, numGenerations, mutationRate):
     population = generatePopulation(valuesList, weightList, capacity, populationSize)
+    bestOfAll = 0
+    bestGen = 0
     #print('pop = ', population)
     for i in range(numGenerations):
-        print('\n gen = ', i)
+        print('\ngen = ', i)
         adapted = adaptation(population, valuesList, capacity)
-        print('adapt = ', adapted)
+        #print('adapt = ', adapted)
         selected = selection(population, adapted)
         #print('sel = ', selected)
         children = crossover(selected)
@@ -17,9 +19,11 @@ def geneticAlgorithm(valuesList, weightList, capacity, populationSize, numGenera
         best = getBest(population, valuesList, weightList, capacity)
         print('best ', best)
         population = mutated
-
-    a = 1
-    return a, a, a
+        if best >= bestOfAll:
+            bestOfAll = best
+            bestGen = i
+    lastBest = best
+    return bestOfAll, bestGen, lastBest
 
 
 def generateIndividual(size):
@@ -27,11 +31,11 @@ def generateIndividual(size):
     return individual
     
 def generatePopulation(values, weights, capacity, populationSize):
-    population = []
+    population = [] 
     while(len(population) < populationSize):
         individual = generateIndividual(len(values))
         fit = doesFit(individual, capacity, values, weights)
-        if fit:
+        if fit: #VER SE FARIA SENTIDO DEIXAR INDIVIDUO INVALIDO
             population.append(individual)
     return population
 
@@ -57,7 +61,7 @@ def adaptation(population, values, capacity):
             indValue = 0
         adapted.append(indValue)
         totalSum += indValue
-    for i in range(len(adapted)):
+    for i in range(len(adapted)): #exist chance of division by zero
         adapted[i] = adapted[i]/totalSum
     return adapted
 
