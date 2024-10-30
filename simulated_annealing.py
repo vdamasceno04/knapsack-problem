@@ -66,7 +66,7 @@ def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_f
         time+=1
         temperature = temperature_calculate(t_selector, max_temperature, time)
 
-    return higher_profit, best_time, initial_state_profit    
+    return higher_profit, best_time, initial_state_profit, time    
     #return higher_profit, better_state, initial_state_profit, initial_state, best_time   
 
 #####################################################################################

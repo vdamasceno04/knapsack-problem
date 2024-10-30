@@ -74,7 +74,7 @@ def main():
     bestCycles = []
     while(contExec < args.exec):
         if args.algorithm == 'annealing': 
-            bestValue, bestCycle, lastValue = annealingAlgorithm(weightList, valuesList, capacity, args.t_selector, args.random_start_flag)
+            bestValue, bestCycle, lastValue, finalCycle = annealingAlgorithm(weightList, valuesList, capacity, args.t_selector, args.random_start_flag)
             bestValues.append(bestValue)
             lastValues.append(lastValue)
             bestCycles.append(bestCycle)
@@ -98,11 +98,12 @@ def main():
 
     elif args.algorithm == 'annealing':
         #PARAMETRO DE CICLOS 
-        cycles = 1#(TODO)
+        cycles = finalCycle
         testName = 'ts'+str(args.t_selector)+'_f'+str(args.random_start_flag)+'.png'
+        
     graph.plot(bestValues, 'bestValues', cycles, 'best'+testName)
     graph.plot(lastValues, 'lastValues', cycles, 'last'+testName)
-    #graph.plot(bestCycles, 'bestCycles', cycles, 'cycle'+testName)
+    graph.plot(bestCycles, 'bestCycles', cycles, 'cycle'+testName)
 #################################################################
 import graph
 
