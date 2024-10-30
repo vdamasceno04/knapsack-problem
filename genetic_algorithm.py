@@ -7,9 +7,11 @@ def geneticAlgorithm(valuesList, weightList, capacity, populationSize, numGenera
     bestGen = 0
     #print('pop = ', population)
     for i in range(numGenerations):
-        print('\ngen = ', i)
-        adapted = adaptation(population, valuesList, capacity)
+        #print('\ngen = ', i)
+        adapted = adaptation(population, valuesList, weightList, capacity)
         #print('adapt = ', adapted)
+        if adapted == False: #if all individuals have value > capacity
+            return bestOfAll, bestGen, lastBest
         selected = selection(population, adapted)
         #print('sel = ', selected)
         children = crossover(selected)
@@ -17,12 +19,12 @@ def geneticAlgorithm(valuesList, weightList, capacity, populationSize, numGenera
         mutated = mutation(children, mutationRate)
         #print('mut', mutated)
         best = getBest(population, valuesList, weightList, capacity)
-        print('best ', best)
+        #print('best ', best)
         population = mutated
         if best >= bestOfAll:
             bestOfAll = best
             bestGen = i
-    lastBest = best
+        lastBest = best
     return bestOfAll, bestGen, lastBest
 
 
@@ -35,7 +37,7 @@ def generatePopulation(values, weights, capacity, populationSize):
     while(len(population) < populationSize):
         individual = generateIndividual(len(values))
         fit = doesFit(individual, capacity, values, weights)
-        if fit: #VER SE FARIA SENTIDO DEIXAR INDIVIDUO INVALIDO
+        if fit: #Doesnt allow individuals that dont fit in initial population
             population.append(individual)
     return population
 
@@ -47,32 +49,36 @@ def doesFit(individual, capacity, values, weights):
             value += values[i]
             weight += weights[i]
     if weight > capacity:
-        return False
+        return 0
     return value
 
-def adaptation(population, values, capacity):
+def adaptation(population, values, weights, capacity):
     totalSum = 0
     adapted = []
     for individual in population:
-        indValue = 0
-        for i in range(len(individual)):
-            indValue += individual[i] * values[i]
-        if indValue > capacity:
-            indValue = 0
-        adapted.append(indValue)
-        totalSum += indValue
-    for i in range(len(adapted)): #exist chance of division by zero
-        adapted[i] = adapted[i]/totalSum
+        fitness = doesFit(individual, capacity, values, weights)
+        adapted.append(fitness)
+        totalSum += fitness
+    for i in range(len(adapted)): 
+        if totalSum == 0: #if all individuals have value > capacity
+            return False
+        else:
+            adapted[i] = adapted[i]/totalSum
     return adapted
 
-def selection(population, adapted):
-    length = len(population)
+def selection(population, adapted): 
+    """selects individuals based on their adaptation
+    an individual can be selected more than once"""
+    length = len(population)        
     if length % 2 != 0:
         length -= 1
     selected = random.choices(population, weights=adapted, k = length)
     return selected
 
 def crossover(selected):
+    """generates 2 children mixing 2 parents
+    child1 is 90% parent1 and 10% parent2
+    child2 is 90% parent2 and 10% parent1"""                        
     crosspoint = len(selected) - math.ceil((len(selected[0])*0.01))
     for i in range(len(selected)):
         if i%2 == 0:
@@ -81,7 +87,6 @@ def crossover(selected):
             selected[i] = child1
             selected[i+1] = child2
     return selected
-
 
 def mutation(children, mutationRate):
     for child in children:

@@ -66,21 +66,13 @@ def main():
     lastValues = []
     bestCycles = []
     while(contExec < args.exec):
-        print('exec ', contExec)
-        if args.algorithm == 'random':
-            value, weight, items = randomAlgorithm(valuesList, weightList, capacity)
-            print('Value: ', value)
-            print('Weight: ', weight)
-            print('Items: ', items)
-
-        elif args.algorithm == 'annealing':
+        if args.algorithm == 'annealing':
             bestValue, bestCycle, lastValue = 1,1,1#annealingAlgorithm(valuesList, weightList, capacity, blablabla)
             bestValues.append(bestValue)
             lastValues.append(lastValue)
             bestCycles.append(bestCycle)
 
         elif args.algorithm == 'genetic':
-            print('caiu')
             if not args.populationSize or not args.numGenerations or not args.mutationRate:
                 print('ERROR: Missing parameters for genetic algorithm')
                 return
@@ -93,27 +85,21 @@ def main():
     print('\nBest value: ', bestValues)
     print('Best cycle: ', bestCycles)
     print('Last value: ', lastValues)
+    if args.algorithm == 'genetic':
+        cycles = args.numGenerations
+        testName = 'mr'+str(args.mutationRate)+'_ps'+str(args.populationSize)+'_ng'+str(args.numGenerations)+'.png'
 
+    elif args.algorithm == 'annealing':
+        #PARAMETRO DE CICLOS 
+        #cycles =
+        #testName =
+        cycles = 1
+        testName = 'xxxxx.png'
+    graph.plot(bestValues, 'bestValues', cycles, 'best'+testName)
+    graph.plot(lastValues, 'lastValues', cycles, 'last'+testName)
+    graph.plot(bestCycles, 'bestCycles', cycles, 'cycle'+testName)
 #################################################################
-
-def randomAlgorithm(values, weights, capacity):
-    """Inserts random items in the knapsack until it tries 
-    to insert an item that would exceed the capacity. """
-    currentWeight = 0
-    currentValue = 0
-    knapsackValues = []
-    while currentWeight < capacity and len(values):
-        item = random.randint(0, len(values) - 1)
-        if currentWeight + weights[item] <= capacity:
-            currentWeight += weights[item]
-            currentValue += values[item]
-            knapsackValues.append(values[item])
-            weights.pop(item)
-            values.pop(item)
-        else:
-            break
-    return currentValue, currentWeight, knapsackValues
-            
+import graph
 
 if __name__ == '__main__':
     main()             
