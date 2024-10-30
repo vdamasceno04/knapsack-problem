@@ -4,8 +4,11 @@ import random
 import time
 
 from genetic_algorithm import geneticAlgorithm
+from simulated_annealing import annealingAlgorithm
 
 def parse_args():
+    #python3 main.py genetic 20 -ex 100 -ps 10 -ng 20 -mr 0.01
+    #python3 main.py annealing 20 -seed 10 -ex 100 -ts 0 -f False
     parser = ArgumentParser(description = 'Knapsack Problem')
     parser.add_argument('algorithm', help = 'Possible algoritms: random, annealing, genetic')
     parser.add_argument('totalItems', type = int, help = 'Total number of items')
@@ -24,7 +27,11 @@ def parse_args():
                         help = 'only for genetic algorithm')
     parser.add_argument('-mr', action = 'store', dest = 'mutationRate', type = float, required = False,
                         help = 'only for genetic algorithm')
-
+    parser.add_argument('-ts', action = 'store', dest = 't_selector', type = int, required = False,
+                        help = 'only for annealing algorithm')
+    parser.add_argument('-f', action = 'store', dest = 'random_start_flag', type = bool, required = False,
+                        help = 'only for annealing algorithm')
+    
     return parser.parse_args()
 
 def main():
@@ -66,8 +73,8 @@ def main():
     lastValues = []
     bestCycles = []
     while(contExec < args.exec):
-        if args.algorithm == 'annealing':
-            bestValue, bestCycle, lastValue = 1,1,1#annealingAlgorithm(valuesList, weightList, capacity, blablabla)
+        if args.algorithm == 'annealing': 
+            bestValue, bestCycle, lastValue = annealingAlgorithm(weightList, valuesList, capacity, args.t_selector, args.random_start_flag)
             bestValues.append(bestValue)
             lastValues.append(lastValue)
             bestCycles.append(bestCycle)
@@ -91,13 +98,11 @@ def main():
 
     elif args.algorithm == 'annealing':
         #PARAMETRO DE CICLOS 
-        #cycles =
-        #testName =
-        cycles = 1
-        testName = 'xxxxx.png'
+        cycles = 1#(TODO)
+        testName = 'ts'+str(args.t_selector)+'_f'+str(args.random_start_flag)+'.png'
     graph.plot(bestValues, 'bestValues', cycles, 'best'+testName)
     graph.plot(lastValues, 'lastValues', cycles, 'last'+testName)
-    graph.plot(bestCycles, 'bestCycles', cycles, 'cycle'+testName)
+    #graph.plot(bestCycles, 'bestCycles', cycles, 'cycle'+testName)
 #################################################################
 import graph
 

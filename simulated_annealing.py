@@ -1,3 +1,4 @@
+import sys
 import math
 import numpy as np
 
@@ -28,39 +29,45 @@ def temperature_calculate(t_selector, max_temperature, time):
         angle = (math.pi*time)/max_temperature #Em rad entre(pi/2 < a < 3/2*pi)
         decay_factor = math.cos(angle) + 1
         return (max_temperature/2)*decay_factor
+    elif t_selector == 2:
+        if time != 0:
+            decay_factor = math.exp(1/(2*time)) -1 
+        else:
+            decay_factor = 1
+        return max_temperature*decay_factor
     else:
         print("VALOR DE TEMPERATURA INVALIDO")
         return -1 
 
-def algorithm(weights, values, bag_capacity, t_selector, random_start_flag):
+def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_flag):
     max_temperature = 1000
     
     time = 0
     states_lenght = len(weights)
-    higher_profit, better_state  = 0, np.zeros(states_lenght, dtype=int)
+    higher_profit, better_state, best_time  = 0, np.zeros(states_lenght, dtype=int), 0
     if random_start_flag == True:
         initial_state = np.random.randint(0, 2, states_lenght) #Criar etado inicial aleatorio. 
     else:
         initial_state = np. concatenate((np.array([1]), np.zeros(states_lenght-1, dtype=int))) #Começa no etado inicial que fica no teto(meio). 
     initial_state_profit = profit_calculate(initial_state, weights, values, bag_capacity)
-    e_max = round(math.exp(initial_state_profit), 3)
+    e_max = sys.float_info.max #round(math.exp(initial_state_profit), 3)(TODO)
     temperature = temperature_calculate(t_selector, max_temperature, time)
-    while temperature > 1:#Nao pode ser > 0 para não estourar no calculo de e nas ultimas execuções  
+    while temperature > 100:#Nao pode ser > 0 para não estourar no calculo de e nas ultimas execuções(TODO) 
         sucessor_state =  np.random.randint(0, 2, states_lenght)#Pega proximo estado
-        while np.array_equal(sucessor_state, initial_state) == True: 
-            sucessor_state =  np.random.randint(0, 2, states_lenght)#Pega proximo estado
         sucessor_state_profit = profit_calculate(sucessor_state, weights, values, bag_capacity)
-        e_value = round(math.exp((initial_state_profit - sucessor_state_profit)/temperature), 3) 
+        
+        e_value = round(math.exp((sucessor_state_profit - initial_state_profit)/temperature), 3) 
         if (sucessor_state_profit > initial_state_profit or np.random.uniform(0, e_max) <= e_value):
             if sucessor_state_profit > higher_profit:
-                higher_profit, better_state = sucessor_state_profit, sucessor_state
+                higher_profit, better_state, best_time = sucessor_state_profit, sucessor_state, time
 
             initial_state, initial_state_profit = sucessor_state, sucessor_state_profit 
 
         time+=1
         temperature = temperature_calculate(t_selector, max_temperature, time)
-        
-    return higher_profit, better_state, initial_state_profit, initial_state  
+
+    return higher_profit, best_time, initial_state_profit    
+    #return higher_profit, better_state, initial_state_profit, initial_state, best_time   
 
 #####################################################################################
 #answer = algorithm(weights, values, bag_capacity, 1, False) 
