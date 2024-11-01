@@ -29,8 +29,12 @@ def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_f
     initial_state_profit = profit_calculate(initial_state, weights, values, bag_capacity)
     temperature = temperature_calculate(t_selector, max_temperature, time)
     while temperature > 100:#VER SE ESSA CONDICAO AINDA É NECESSÁRIA 
+        temperature = temperature_calculate(t_selector, max_temperature, time)
         sucessor_state =  np.random.randint(0, 2, states_lenght)#New random state
         sucessor_state_profit = profit_calculate(sucessor_state, weights, values, bag_capacity)
+        if sucessor_state_profit == -1:
+            time += 1
+            continue
         delta = sucessor_state_profit - initial_state_profit
         if delta < 0:
             e_value = round(math.exp(delta/temperature), 3) #calculate e only if next move is worse
@@ -39,8 +43,7 @@ def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_f
             initial_state, initial_state_profit = sucessor_state, sucessor_state_profit 
             if sucessor_state_profit > higher_profit:
                 higher_profit, best_time = sucessor_state_profit, time
-        time+=1
-        temperature = temperature_calculate(t_selector, max_temperature, time)
+        time += 1
 
     return higher_profit, best_time, initial_state_profit, time    
 
