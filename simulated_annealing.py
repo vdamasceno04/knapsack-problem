@@ -14,8 +14,38 @@ import numpy as np
 #Resposta para o exemplo: ?
 ####################################################################
 
+def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_flag):
+    max_temperature = 1000
+    time = 0
+    states_lenght = len(weights)
+    higher_profit, best_time  = 0, 0
+    
+    if random_start_flag == True:
+        initial_state = np.random.randint(0, 2, states_lenght) #Random state
+    else:
+        initial_state = np.zeros(states_lenght, dtype=int) #All zeros state, global minimum
+        #initial_state = np.concatenate((np.array([1]), np.zeros(states_lenght-1, dtype=int))) #[1,0,0,...,0]
+    
+    initial_state_profit = profit_calculate(initial_state, weights, values, bag_capacity)
+    temperature = temperature_calculate(t_selector, max_temperature, time)
+    while temperature > 100:#VER SE ESSA CONDICAO AINDA É NECESSÁRIA 
+        sucessor_state =  np.random.randint(0, 2, states_lenght)#New random state
+        sucessor_state_profit = profit_calculate(sucessor_state, weights, values, bag_capacity)
+        delta = sucessor_state_profit - initial_state_profit
+        if delta < 0:
+            e_value = round(math.exp(delta/temperature), 3) #calculate e only if next move is worse
+        if (delta >= 0 or np.random.uniform(0, 1) <= e_value): 
+            #if next state is better or random number is in range of e_value
+            initial_state, initial_state_profit = sucessor_state, sucessor_state_profit 
+            if sucessor_state_profit > higher_profit:
+                higher_profit, best_time = sucessor_state_profit, time
+        time+=1
+        temperature = temperature_calculate(t_selector, max_temperature, time)
+
+    return higher_profit, best_time, initial_state_profit, time    
+
 def profit_calculate(state, weights, values, bag_capacity):
-    if (sum(state * weights) <= bag_capacity):#Vejo se cabe na mochila
+    if (sum(state * weights) <= bag_capacity):#if fits in the bag
         return sum(state * values)
     else:
         return -1
@@ -23,55 +53,12 @@ def profit_calculate(state, weights, values, bag_capacity):
 def temperature_calculate(t_selector, max_temperature, time):
     if t_selector == 0:
         return max_temperature - time
-    elif t_selector == 1:
-        #COLOQUE NO GEOGEBRA PARA ENTENDER MELHOR
-        #f: y=((10)/(2)) (cos(((π)/(10)) x)+1)
-        angle = (math.pi*time)/max_temperature #Em rad entre(pi/2 < a < 3/2*pi)
-        decay_factor = math.cos(angle) + 1
-        return (max_temperature/2)*decay_factor
     elif t_selector == 2:
         if time != 0:
-            decay_factor = math.exp(1/(2*time)) -1 
+            decay_factor = math.exp(1/(2*time)) -1 #TESTAR ADICIONAR ALGUMA COEFICIENTE
         else:
             decay_factor = 1
         return max_temperature*decay_factor
     else:
-        print("VALOR DE TEMPERATURA INVALIDO")
+        print("Invalid temperature selector")
         return -1 
-
-def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_flag):
-    max_temperature = 1000
-    
-    time = 0
-    states_lenght = len(weights)
-    higher_profit, better_state, best_time  = 0, np.zeros(states_lenght, dtype=int), 0
-    if random_start_flag == True:
-        initial_state = np.random.randint(0, 2, states_lenght) #Criar etado inicial aleatorio. 
-    else:
-        initial_state = np. concatenate((np.array([1]), np.zeros(states_lenght-1, dtype=int))) #Começa no etado inicial que fica no teto(meio). 
-    initial_state_profit = profit_calculate(initial_state, weights, values, bag_capacity)
-    e_max = sys.float_info.max #round(math.exp(initial_state_profit), 3)(TODO)
-    temperature = temperature_calculate(t_selector, max_temperature, time)
-    while temperature > 100:#Nao pode ser > 0 para não estourar no calculo de e nas ultimas execuções(TODO) 
-        sucessor_state =  np.random.randint(0, 2, states_lenght)#Pega proximo estado
-        sucessor_state_profit = profit_calculate(sucessor_state, weights, values, bag_capacity)
-        
-        e_value = round(math.exp((sucessor_state_profit - initial_state_profit)/temperature), 3) 
-        if (sucessor_state_profit > initial_state_profit or np.random.uniform(0, e_max) <= e_value):
-            if sucessor_state_profit > higher_profit:
-                higher_profit, better_state, best_time = sucessor_state_profit, sucessor_state, time
-
-            initial_state, initial_state_profit = sucessor_state, sucessor_state_profit 
-
-        time+=1
-        temperature = temperature_calculate(t_selector, max_temperature, time)
-
-    return higher_profit, best_time, initial_state_profit, time    
-    #return higher_profit, better_state, initial_state_profit, initial_state, best_time   
-
-#####################################################################################
-#answer = algorithm(weights, values, bag_capacity, 1, False) 
-#print(f'Maior lucro: {answer[0]}\n' 
-#        f'Melhor estado: {answer[1]}\n'
-#        f'Ultimo lucro: {answer[2]}\n'
-#        f'Ultimo estado: {answer[3]}')
