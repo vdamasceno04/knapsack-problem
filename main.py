@@ -8,7 +8,7 @@ from simulated_annealing import annealingAlgorithm
 
 def parse_args():
     #python3 main.py genetic 20 -ex 100 -ps 10 -ng 20 -mr 0.01
-    #python3 main.py annealing 20 -seed 10 -ex 100 -ts 0 -f False
+    #python3 main.py annealing 20 -seed 10 -ex 1000 -ts 1 -f True
     parser = ArgumentParser(description = 'Knapsack Problem')
     parser.add_argument('algorithm', help = 'Possible algoritms: random, annealing, genetic')
     parser.add_argument('totalItems', type = int, help = 'Total number of items')
@@ -64,7 +64,7 @@ def main():
 
     print('Values list: ',valuesList)
     print('Weights list: ', weightList)
-    print('Capacity: ', capacity)
+    print('Capacity: ', capacity, '\n')
 
     if args.exec is None:
         args.exec = 1
@@ -87,7 +87,8 @@ def main():
             bestValues.append(bestValue)
             lastValues.append(lastValue)
             bestCycles.append(bestCycle)
-            
+
+        print(f'Executado {contExec+1} de {args.exec};')    
         contExec += 1
     print('\nBest value: ', bestValues)
     print('Best cycle: ', bestCycles)
@@ -99,11 +100,11 @@ def main():
     elif args.algorithm == 'annealing':
         #PARAMETRO DE CICLOS 
         cycles = finalCycle
-        testName = 'ts'+str(args.t_selector)+'_f'+str(args.random_start_flag)+'.png'
+        testName = f'annealing_totalItems({args.totalItems})_seed({args.seed})_ex({args.exec})_ts({args.t_selector})_f({args.random_start_flag}).png'
         
-    graph.plot(bestValues, 'bestValues', cycles, 'best'+testName)
-    graph.plot(lastValues, 'lastValues', cycles, 'last'+testName)
-    graph.plot(bestCycles, 'bestCycles', cycles, 'cycle'+testName)
+    graph.plot(bestValues, 'bestValues', cycles, 'best_'+testName)
+    graph.plot(lastValues, 'lastValues', cycles, 'last_'+testName)
+    graph.plot(bestCycles, 'bestCycles', cycles, 'cycle_'+testName)
 #################################################################
 import graph
 
