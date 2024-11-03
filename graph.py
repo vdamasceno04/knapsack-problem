@@ -9,6 +9,7 @@ def plot(values, info, cycles,file_name='teste1.png'):
     maxBest = max(values)
     print('max = ', maxBest)
     if info == 'bestValues':
+        plt.clf()
         ranges = np.linspace(0, maxBest, 21)
         percent_ticks = np.linspace(0, 100, 21)  # De 0 a 100%, 21 ticks para 5% a cada ponto
         plt.xticks(ranges, [f'{int(p)}%' for p in percent_ticks])
@@ -20,9 +21,10 @@ def plot(values, info, cycles,file_name='teste1.png'):
         plt.ylabel('Frequência')
         plt.grid(True)
         plt.savefig("images/" + file_name)
-        plt.show()#Comentar para não travar execução do script
+        #plt.show()#Comentar para não travar execução do script
 
     elif info == 'lastValues':
+        plt.clf()
         ranges = np.linspace(0, maxBest, 21)
         percent_ticks = np.linspace(0, 100, 21)  # De 0 a 100%, 21 ticks para 5% a cada ponto
         plt.xticks(ranges, [f'{int(p)}%' for p in percent_ticks])
@@ -37,6 +39,7 @@ def plot(values, info, cycles,file_name='teste1.png'):
         plt.show()#Comentar para não travar execução do script
 
     elif info == 'bestCycles':
+        plt.clf()
         ranges = np.linspace(0, maxBest, 21)
         percent_ticks = np.linspace(0, 100, 21)  # De 0 a 100%, 21 ticks para 5% a cada ponto
         plt.xticks(ranges, [f'{int(p)}%' for p in percent_ticks])

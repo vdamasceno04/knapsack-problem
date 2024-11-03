@@ -45,7 +45,7 @@ def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_f
             if sucessor_state_profit > higher_profit:
                 higher_profit, best_time = sucessor_state_profit, time
         time += 1
-    return higher_profit, best_time, initial_state_profit, (time -1)    
+    return higher_profit, best_time, initial_state_profit, (time -1)   
 
 def profit_calculate(state, weights, values, bag_capacity):
     if (sum(state * weights) <= bag_capacity):#if fits in the bag

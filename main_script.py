@@ -12,4 +12,5 @@ def execute_annealing(t_selector, random_start_flag):
     result = subprocess.run(comand) 
     print(f"========================================================================\n  {' '.join(comand)} - EXECUTED\n========================================================================\n")
 
+execute_annealing('0', 'True')
 execute_annealing('1', 'True')
