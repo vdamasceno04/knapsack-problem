@@ -15,7 +15,6 @@ import numpy as np
 ####################################################################
 
 def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_flag):
-    max_temperature = 1000
     time = 0
     states_lenght = len(weights)
     higher_profit, best_time  = 0, 0
@@ -26,9 +25,9 @@ def annealingAlgorithm(weights, values, bag_capacity, t_selector, random_start_f
         initial_state = np.zeros(states_lenght, dtype=int) #All zeros state, global minimum
     
     initial_state_profit = profit_calculate(initial_state, weights, values, bag_capacity)
-    temperature = temperature_calculate(t_selector, max_temperature, time)
-    while temperature >= 1:#VER SE ESSA CONDICAO AINDA É NECESSÁRIA 
-        temperature = temperature_calculate(t_selector, max_temperature, time)
+    temperature = temperature_calculate(t_selector, time)
+    while temperature >= 1:#VER SE ESSA CONDICAO AINDA É NECESSÁRIA
+        temperature = temperature_calculate(t_selector, time)
         
         sucessor_state =  np.random.randint(0, 2, states_lenght)#New random state
         sucessor_state_profit = profit_calculate(sucessor_state, weights, values, bag_capacity)
@@ -53,15 +52,27 @@ def profit_calculate(state, weights, values, bag_capacity):
     else:
         return -1
 
-def temperature_calculate(t_selector, max_temperature, time):
+def temperature_calculate(t_selector, time):
     if t_selector == 0:
+        max_temperature = 1000
         return max_temperature - time
     elif t_selector == 1:
+        max_temperature = 1000
         if time != 0:
             decay_factor = math.exp(1/(2*time)) -1 #TESTAR ADICIONAR ALGUMA COEFICIENTE
         else:
             decay_factor = 1
         return max_temperature*decay_factor
+    elif t_selector == 2:
+        #https://www.desmos.com/calculator/vqat4w8io3
+        #y=a−b⋅e^(−c/x)
+        max_temperature = 1000
+        damping_coefficient = 1250 #1300#obtained by test
+        decay_coefficient = 220  #275#obtained by test
+        if time != 0:
+            return max_temperature - damping_coefficient*(math.exp((-decay_coefficient)/time))  
+        else:
+            return max_temperature
     else:
         print("Invalid temperature selector")
         return -1 
