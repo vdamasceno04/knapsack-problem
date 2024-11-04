@@ -29,7 +29,7 @@ def parse_args():
                         help = 'only for genetic algorithm')
     parser.add_argument('-ts', action = 'store', dest = 't_selector', type = int, required = False,
                         help = 'only for annealing algorithm')
-    parser.add_argument('-f', action = 'store', dest = 'random_start_flag', type = bool, required = False,
+    parser.add_argument('-f', action = 'store_true', dest = 'random_start_flag',  required = False,
                         help = 'only for annealing algorithm')
     
     return parser.parse_args()
